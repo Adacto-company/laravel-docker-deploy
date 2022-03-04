@@ -1,5 +1,5 @@
 {
-    "name": "adacto/laravel-docker-deploy",
+    "name": "adacto-company/laravel-docker-deploy",
     "version": "1.0.0",
     "description": "This package adds all the required files to deploy Laravel using a Docker stack",
     "type": "laravel-package",
