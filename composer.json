@@ -1,0 +1,34 @@
+{
+    "name": "adacto/laravel-docker-deploy",
+    "version": "1.0.0",
+    "description": "This package adds all the required files to deploy Laravel using a Docker stack",
+    "type": "laravel-package",
+    "require-dev": {
+        "laravel/sail": "^1.0.1"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniele Sesoldi",
+            "email": "sesoldi@adacto.it"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Adacto\\LaravelDockerDeploy\\Providers\\LaravelDockerDeployServiceProvider"
+            ],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "Adacto\\LaravelDockerDeploy\\": "src"
+        }
+    }
+}

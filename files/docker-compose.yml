@@ -1,0 +1,62 @@
+version: '3.9'
+services:
+    laravel.test:
+        image: registry.dev.adacto.it/adacto/docker-images/laravel-base:latest
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        env_file: '.env.${APP_ENV}'
+        volumes:
+            - .:/var/www/html
+            - ./docker/environments/${APP_ENV}/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+            - ./docker/common/php-cli.ini:/etc/php/8.1/cli/conf.d/99-sail.ini
+            - ./docker/common/php-fpm.ini:/etc/php/8.1/fpm/conf.d/99-sail.ini
+            - ./docker/common/php-pool.conf:/etc/php/8.1/fpm/pool.d/www.conf
+            - ./docker/common/php-fpm.conf:/etc/php/8.1/fpm/php-fpm.conf
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            meilisearch:
+                condition: service_healthy
+    nginx:
+        image: nginx:alpine
+        volumes:
+            - ./docker/common/nginx-vhost.conf:/etc/nginx/conf.d/default.conf
+            - .:/var/www/html
+        links:
+            - 'laravel.test:php-upstream'
+        depends_on:
+            - laravel.test
+    mysql:
+        image: 'mysql/mysql-server:8.0'
+        env_file: '.env.${APP_ENV}'
+        volumes:
+            - 'mysql-data:/var/lib/mysql'
+        healthcheck:
+            test: [ "CMD-SHELL", "mysql $${MYSQL_DATABASE} -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} -e 'SELECT 1;'" ]
+            retries: 3
+            timeout: 5s
+    redis:
+        image: 'redis:alpine'
+        volumes:
+            - 'redis-data:/data'
+        healthcheck:
+            test: [ "CMD", "redis-cli", "ping" ]
+            retries: 3
+            timeout: 5s
+    meilisearch:
+        image: 'getmeili/meilisearch:latest'
+        volumes:
+            - 'meilisearch-data:/data.ms'
+        healthcheck:
+            test: [ "CMD", "wget", "--no-verbose", "--spider",  "$${MEILISEARCH_HOST}/health" ]
+            retries: 3
+            timeout: 5s
+volumes:
+    mysql-data:
+        driver: local
+    redis-data:
+        driver: local
+    meilisearch-data:
+        driver: local
