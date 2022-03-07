@@ -27,6 +27,12 @@ You can add a new environment using this command:
 php artisan docker-deploy:generate-environment
 ```
 
+For local development you can use Laravel Sail with the standard sail command.
+
+For deployment environments you need to set the APP_ENV environment variable.
+
+Tips: Don't forget to edit the generated .env.* files with your configuration data.
+
 ## Credits
 
 - [Daniele Sesoldi](https://github.com/WorldSeso7)
